@@ -4,9 +4,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+import requests
 import time
 
 flag = True
+
+def send_notificateion(message):
+    header= {"Authorization": f"Bearer {config.ACCESS_TOKEN}"}
+    requests.post(config.API_URL, headers=header, data={'message': message},
+)
 
 def is_right_page(driver, page):
     if page == config.LOGIN_PAGE_URL:
@@ -28,12 +34,18 @@ def loop_access(driver, target_url):
         driver.get(target_url)
         print('Current URL：{0}'.format(driver.current_url))
         #ターゲットURLじゃなかったらリロードにした方がいいかも
-
+        if driver.current_url != config.LOGIN_PAGE_URL:
+            print('アクセス集中ページにリダイレクトされました。')
+            send_notificateion('【log】アクセス集中ページにリダイレクトされました。')
+            continue
+        #一応表示要素で２重チェック
         if is_right_page(driver, target_url):
             print('ACCESS SUCCEED')
+            send_notificateion('【log】ログイン画面が表示されました。')
             break
         else:
             print('ロードに時間がかかっているか、アクセス集中ページにリダイレクトされました。')
+            send_notificateion('【log】ログイン画面のロードに時間がかかっているか、アクセス集中ページにリダイレクトされました。')
     return
 
 #ログイン処理
@@ -67,17 +79,20 @@ def move_to_top_page(driver):
         except:
             #再度ログイン
             print('再ログインします。')
+            send_notificateion('【log】再ログインします。')
             login(driver)
             continue
         else:
             break
     
+    send_notificateion('【log】ログイン成功')
     #該当ページに到達するまで10個ずつタブを開いてはチェックして消すを繰り返す
     i = 0
     global flag
     while(flag):
         i += 1
-        print('10タブ展開{0}回目....'.format(i))
+        print('３タブ展開{0}回目....'.format(i))
+        send_notificateion('【log】３タブ展開{0}回目....'.format(i))
         driver.switch_to.window(driver.window_handles[0])
         open_ticket_page(driver)
     
@@ -111,6 +126,8 @@ def open_ticket_page(driver):
             print('このタブには次へボタンがない。')
             driver.close()
         else:
+            #LINEで通知
+            send_notificateion('【祝】チケット購入ページが表示されました。')
             #タプ展開＆チェックの無限ループを終了しチケット選択処理へ
             global flag
             flag = False
