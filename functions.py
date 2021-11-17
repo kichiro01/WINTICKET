@@ -45,7 +45,7 @@ def loop_access(driver, target_url):
             break
         else:
             print('ロードに時間がかかっているか、アクセス集中ページにリダイレクトされました。')
-            send_notificateion('【log】ログイン画面のロードに時間がかかっているか、アクセス集中ページにリダイレクトされました。')
+            #send_notificateion('【log】ログイン画面のロードに時間がかかっているか、アクセス集中ページにリダイレクトされました。')
     return
 
 #ログイン処理
@@ -70,7 +70,7 @@ def login(driver):
         driver.execute_script('arguments[0].click();', element)
     return
 
-def move_to_top_page(driver):
+def move_to_top_page(driver, waitAfterLogin):
     element = None
     #トップページにあるはずのチケットボタンが確認できない場合ログインからやり直し続ける
     while(True):
@@ -86,6 +86,10 @@ def move_to_top_page(driver):
             break
     
     send_notificateion('【log】ログイン成功')
+
+    if(waitAfterLogin):
+        var = input("type enter key to continue: ")
+
     #該当ページに到達するまで10個ずつタブを開いてはチェックして消すを繰り返す
     i = 0
     global flag
@@ -139,7 +143,7 @@ def open_ticket_page(driver):
 def select_conditions(driver):
     #カレンダーを捲るボタン、日程選択ボタン、自宅でプリントボタンはそれぞれ離れた場所にあり、クリックのタイミングで次のボタンがウィンドウ外にあるためjavascriptからクリックを実行。
     next_button = driver.find_element_by_class_name('slick-next')
-    day_button = driver.find_element_by_xpath('//a[@data-daynumbercount="60"]')
+    day_button = driver.find_element_by_xpath('//a[@data-daynumbercount="54"]')
     search_button = driver.find_element_by_id("searchEticket")
     driver.execute_script('arguments[0].click(); arguments[1].click(); arguments[2].click()', next_button, day_button, search_button)
     return

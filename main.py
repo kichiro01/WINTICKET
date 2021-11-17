@@ -1,5 +1,6 @@
 
 from selenium import webdriver
+import chromedriver_binary
 import functions
 import time
 
@@ -7,7 +8,7 @@ import time
 # WebDriver のオプションを設定する
 options = webdriver.ChromeOptions()
 #画像読み込みを省略して軽量化
-options.add_argument('--blink-settings=imagesEnabled=false')
+#options.add_argument('--blink-settings=imagesEnabled=false')
 #↓動作確認のためコメントアウト
 #options.add_argument('--headless') 
 
@@ -18,7 +19,7 @@ driver = webdriver.Chrome(options=options)
 #driver.implicitly_wait(30)
 
 functions.login(driver)
-functions.move_to_top_page(driver)
+functions.move_to_top_page(driver, False)
 
 # ブラウザを終了する(最終画面からの操作猶予30分)
 time.sleep(1800)
